@@ -1,0 +1,93 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %} Лента новостей {% endblock title %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <!-- Header -->
+    <div class="header bg-primary pb-6">
+      <div class="container-fluid">
+        <div class="header-body">
+          <div class="row align-items-center py-4">
+            <div class="col-12 text-left">
+              <a href="/feed?{{from_redirect}}" class="btn btn-icon btn-neutral">
+                  <span class="btn-inner--icon"><i class="ni ni-bold-left"></i></span>
+                  <span class="btn-inner--text">Вернуться к ленте</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Page content -->
+    <div class="container-fluid mt--6">
+      <div class="row">
+        <div class="col-12">
+           <div class="card">
+                     <div class="card-body">
+                          <p class="display-3 font-weight-bold mb-0">{{post.title}}</p>
+                          <p class="h2 font-weight-light mb-3">{{post.subtitle}}</p>
+                          <h5 class="card-title text-left text-uppercase text-muted mb-5">{{post.date}}</h5>
+                         <div class="row">
+                             <div class="col-md-3 pb-5 pb-md-0">
+                                 <img class="card-img pb-2" src="{{post.image_url}}" style="object-fit: cover; aspect-ratio: 3/2;" alt="Картинка">
+                                 <div class="card border-0" style="overflow: hidden">
+                                      {{ map | safe }}
+                                 </div>
+                             </div>
+                             <div class="col-md-6">
+                                 <h2 class="card-text font-weight-normal">{{post.content}}</h2>
+                             </div>
+                         </div>
+
+                     </div>
+            </div>
+        </div>
+
+
+<!--        <div class="col-xl-4 col-sm-6">-->
+<!--          <div class="card">-->
+<!--            <img class="card-img-top" src="" style="object-fit: cover; aspect-ratio: 3/2;" alt="Картинка">-->
+<!--            <div class="card-body">-->
+<!--                  <h5 class="card-title text-uppercase text-muted mb-0">10.05.2024</h5>-->
+<!--                  <p class="h2 font-weight-bold mb-0"></p>-->
+<!--                  <p class="h3 font-weight-light mb-3"> </p>-->
+<!--                  <a href="#" class="btn btn-primary">Читать</a>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--        <div class="col-xl-4 col-sm-6">-->
+<!--          <div class="card">-->
+<!--            <div style="aspect-ratio: 240/160;">-->
+<!--              <img class="card-img-top" src="https://icdn.lenta.ru/images/2024/05/06/17/20240506173317278/owl_detail_240_81b760b649eaef3d3f0ecf57e9113016.jpg" style="object-fit: cover; aspect-ratio: 3/2;" alt="Картинка">-->
+<!--            </div>-->
+
+<!--            <div class="card-body">-->
+<!--                  <h5 class="card-title text-uppercase text-muted mb-0">10.05.2024</h5>-->
+<!--                  <p class="h2 font-weight-bold mb-0">Французы приготовили самый длинный багет в мире</p>-->
+<!--                  <p class="h3 font-weight-light mb-3">Французские пекари приготовили багет длиной 140 метров и побили рекорд Гиннесса</p>-->
+<!--                  <a href="#" class="btn btn-primary">Читать</a>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--        </div>-->
+
+      </div>
+
+
+      {% include "includes/footer.html" %}
+
+    </div>
+
+{% endblock content %}
+
+<!-- Specific JS goes HERE --> 
+{% block javascripts %}
+
+  <script src="/static/assets/vendor/chart.js/dist/Chart.min.js"></script>
+  <script src="/static/assets/vendor/chart.js/dist/Chart.extension.js"></script>
+
+{% endblock javascripts %}

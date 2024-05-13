@@ -1,0 +1,137 @@
+{% extends 'layouts/base-index.html' %}
+
+{% block title %}Главная{% endblock title %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+    <div class="pt-7 container-fluid bg-index-darkblue">
+        <div class="container">
+
+                <div class="container-fluid w-auto">
+                    <div class="row pb-5">
+                        <div class="col-md-6 col-sm-12 align-content-center">
+                            <div style="border: solid;border-color: white;border-width: 2px;border-radius: 30px;width: fit-content;"
+                                class="px-3 py-2">
+                                <p class="m-0 text-light text-left martian-mono-regular">Глобальный взгляд</p>
+                                <p class="m-0 text-light text-left martian-mono-regular">На новостной ряд</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row pb-7">
+                        <div class="col-md mr-lg-6 pt-5 order-2 order-md-1">
+                            <h1 class="pb-5 roboto-regular display-xxl text-xl-left text-sm-center text-white display-1" style="line-height: 1">
+                                Карта ваших избранных новостей
+                            </h1>
+                            <div class="mr-md-3 mr-xl-7">
+                                <a href="/geo" class="btn btn-lg btn-block btn-primary martian-mono-regular">Искать по местоположению</a>
+                        </div>
+
+
+                        </div>
+                        <div class="col-md order-1 order-md-2 py-4 py-md-0">
+                            <div class="logo-frame">
+                                <div class="logo-figure logo-figure-1"></div>
+                                <div class="logo-figure logo-figure-2">
+                                    <div class="img-wrapper">
+                                        <img src="/static/assets/img/index/astro.jpg" alt="">
+                                    </div>
+
+                                </div>
+                                <div class="logo-figure logo-figure-3">
+                                    <div class="img-wrapper">
+                                        <img class="bg-image" src="/static/assets/img/index/city1.jpg" alt="">
+                                    </div>
+                                </div>
+                                <div class="logo-figure logo-figure-4"></div>
+                                <div class="logo-figure logo-figure-5">
+                                    <img src="/static/assets/img/index/bg.jpg" alt="">
+                                </div>
+                                <div class="logo-figure logo-figure-6"></div>
+                                <div class="logo-figure logo-figure-7">
+                                    <div class="img-wrapper">
+                                        <img class="bg-image" src="/static/assets/img/index/city2.jpg" alt="">
+                                    </div>
+                                </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+        </div>
+    </div>
+
+    <div class="bg-darker py-5 py-lg-6">
+        <div class="container">
+            <div class="row pb-7 px-3">
+                <div class="col-md pt-5">
+                    <h1 class="pb-2 pb-md-5 roboto-regular text-xl-left text-sm-center text-primary display-1" style="line-height: 1">
+                        Прямо на карте
+                    </h1>
+                </div>
+                <div class="col-md pt-0 pt-md-4">
+                    <p class="martian-mono-regular text-left text-light text-lg">
+                        Получайте последние новости от лучших новостных агентств мира. Сортируйте статьи по персонам, организациям, дате и местоположению.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-darker pb-7 pb-lg-8">
+        <div class="container">
+            <div class="pt-5">
+                <h1 class="pb-2 pb-md-5 roboto-regular text-center text-primary display-1" style="line-height: 1">
+                    Начните искать
+                </h1>
+                <p class="martian-mono-regular text-center text-primary text-lg col-md-7 center">
+                    Вы всегда будете в курсе последних новостей благодаря нашей карте местоположения статей. Просто введите название места, и вы увидите актуальные новости в этом районе!
+                </p>
+                <div class="btn-group center">
+                    <a href="/feed" class="btn btn-lg btn-primary martian-mono-regular">Попробуйте сейчас</a>
+                    <a href="/" class="btn btn-lg btn-magenta martian-mono-regular">Узнать больше</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-index-magenta py-7 py-lg-8">
+        <div class="container">
+            <div class="pt-5 px-3">
+                <h2 class="pb-2 pb-md-5 roboto-regular text-left text-light display-1">
+                    Часто задаваемые вопросы
+                </h2>
+            </div>
+            <div class="row pb-7 px-3">
+                <div class="col-md">
+                    <h3 class="pb-2 martian-mono-regular text-left text-light text-md">
+                        Как работает сортировка статей?
+                    </h3>
+                    <p class="pb-2 martian-mono-regular text-left text-primary text-sm w-75">
+                        Наши продвинутые алгоритмы анализируют новостные сайты и выдают статьи, отфильтрованные по нужным критериям.
+                    </p>
+                </div>
+                <div class="col-md">
+                    <h3 class="pb-2 martian-mono-regular text-left text-light text-md">
+                        Как работает поиск по названию мест?
+                    </h3>
+                    <p class="pb-2 martian-mono-regular text-left text-primary text-sm w-75">
+                        Просто введите название места в наш поисковый движок, и вы получите координаты этого объекта.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-darker py-4">
+        <div class="container text-center">
+            <a href="https://t.me/globallook_news" class="text-center text-primary text-sm martian-mono-regular">Мы есть в Telegram!</a>
+        </div>
+    </div>
+{% endblock content %}
+
+{% block javascripts %}{% endblock javascripts %}

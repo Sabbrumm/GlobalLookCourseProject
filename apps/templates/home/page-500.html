@@ -1,0 +1,55 @@
+{% extends 'layouts/base-errorscreen.html' %}
+
+{% block title %} Ошибка сервера {% endblock title %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <!-- Page content -->
+    <div class="container mt--8 pb-5">
+      <div class="row justify-content-center">
+        <div class="col-lg-5 col-md-7">
+          <div class="card bg-secondary shadow border-0">
+            <div class="card-header bg-transparent pb-5">
+
+              <div class="text-muted text-center mt-2 mb-3">
+                Упс! У нас неполадки!
+              </div>
+
+              <div class="text-center mb-3">
+                Ошибка сервера
+              </div>
+
+              <div class="text-center mb-1">
+                <a href="https://t.me/sabbrumm">Свяжитесь с поддержкой</a>
+              </div>
+              <div class="text-center mb-1">
+                или
+              </div>
+              <div class="text-center mb-4">
+                 <a href="/feed">Перейдите на главную</a>
+              </div>
+
+
+
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-6">
+              <a href="/feed" class="text-light"><small>Главная</small></a>
+            </div>
+            <div class="col-6 text-right">
+              <a target="_blank" 
+                 href="https://t.me/sabbrumm" class="text-light"><small>Поддержка</small></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+{% endblock content %}
+
+<!-- Specific JS goes HERE --> 
+{% block javascripts %}{% endblock javascripts %}
