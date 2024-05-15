@@ -21,7 +21,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path("", include("apps.api.urls")),
     path("", include("apps.index.urls")),
-    path("", include("apps.auth.urls")),  # Auth routes - login / register
-    path("", include("apps.home.urls")),  # UI Kits Html files
-     # Api routes
+    path("", include("apps.auth.urls")),
+    path("", include("apps.home.urls"))
 ]

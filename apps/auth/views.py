@@ -1,21 +1,12 @@
-# -*- encoding: utf-8 -*-
-"""
-Copyright (c) 2019 - present AppSeed.us
-"""
-
-# Create your views here.
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from .forms import LoginForm, SignUpForm
 
-from django.contrib.auth.views import LogoutView
-
-class UserLogoutView(LogoutView):
-    template_name = 'accounts/logged_out.html'
 
 def logout_view(request):
     logout(request)
     return redirect('/')
+
 
 def login_view(request):
     form = LoginForm(request.POST or None)

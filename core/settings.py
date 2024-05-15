@@ -10,9 +10,6 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 import os
-from pathlib import Path
-
-import config
 from config import ROOT_DIR, STATIC_DIR, TEMPLATES_DIR, config, CORE_DIR
 BASE_DIR = ROOT_DIR
 
@@ -34,9 +31,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'apps.home',
     'rest_framework',
-    'apps.api'
+    'apps.api.config.ApiConfig',
+    'apps.home.config.HomeConfig',
+    'apps.index.config.IndexConfig'
 ]
 
 MIDDLEWARE = [
@@ -50,8 +48,8 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'core.urls'
-LOGIN_REDIRECT_URL = "home"
-LOGOUT_REDIRECT_URL = "home"
+LOGIN_REDIRECT_URL = "feed"
+LOGOUT_REDIRECT_URL = ""
 
 TEMPLATES = [
     {

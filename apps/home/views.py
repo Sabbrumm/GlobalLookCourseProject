@@ -10,16 +10,16 @@ from django.urls import reverse
 import folium
 from folium.plugins import FastMarkerCluster, MarkerCluster
 
-from apps.api.models import GeoLocation
-from apps.home.models import Post
+from apps.api.models import GeoLocation, Article
+
 
 @login_required(login_url="/login/")
 def article(request):
     context = {'segment': 'article'}
     try:
         article_id = int(request.path.split('/')[-1].split('?')[0])
-        post = Post.objects.get(id=article_id)
-    except Post.DoesNotExist:
+        article = Article.objects.get(id=article_id)
+    except Article.DoesNotExist:
         html_template = loader.get_template('home/page-404.html')
         return HttpResponse(html_template.render(context, request))
     except:
@@ -27,7 +27,7 @@ def article(request):
         return HttpResponse(html_template.render(context, request))
 
     map = folium.Map(location=[0, 0], zoom_start=1)
-    for loc in post.locations.all():
+    for loc in article.locations.all():
         lat = float(loc.latitude)
         lng = float(loc.longitude)
 
@@ -38,7 +38,7 @@ def article(request):
         from_redirect = from_redirect.replace(' ', '+')
         context['from_redirect'] = base64.b64decode(from_redirect).decode('utf-8')
 
-    context['post'] = post
+    context['post'] = article
     context['map'] = map._repr_html_()
     html_template = loader.get_template('home/article.html')
     return HttpResponse(html_template.render(context, request))
@@ -87,23 +87,23 @@ def feed(request:WSGIRequest):
 
     href_tags+= f"&date_start={date_from}&date_end={date_to}" if date_from or date_to else ""
 
-    total_posts = Post.objects.filter(**kwargs).count()
-    total_pages = total_posts // 8 + 1
+    total_articles = Article.objects.filter(**kwargs).count()
+    total_pages = total_articles // 8 + 1 if total_articles % 8 != 0 else 0
     if page > total_pages:
         page = total_pages
     elif page < 1:
         page = 1
 
-    posts = Post.objects.filter(**kwargs).order_by('-date')[8 * (page - 1):8 * (page)]
+    articles = Article.objects.filter(**kwargs).order_by('-date')[8 * (page - 1):8 * (page)]
 
     context['page'] = page
     context['total_pages'] = total_pages
 
-    pg_nums = list(set([1] + [page-1 if page>1 else 1, page, page+1 if page<total_pages else 1]
-                       + [total_pages]))
+    pg_nums = sorted(list(set([1] + [page-1 if page>1 else 1, page, page+1 if page<total_pages else 1]
+                       + [total_pages])))
     context['pg_nums'] = pg_nums
 
-    context['posts'] = posts
+    context['posts'] = articles
     lat = 0
     lng = 0
 
@@ -197,8 +197,11 @@ def geo(request):
     if date_to:
         kwargs['date__lte'] = datetime.datetime.strptime(date_to, '%Y-%m-%d')
 
+    # Ограничение - только за сегодняшний день
+    kwargs['date__gte'] = datetime.date.today()
+
     href_tags += f"&date_start={date_from}&date_end={date_to}" if date_from or date_to else ""
-    posts = Post.objects.filter(**kwargs).order_by('-date')
+    articles = Article.objects.filter(**kwargs).order_by('-date')
     lats = []
     lngs = []
     titles = []
@@ -206,8 +209,8 @@ def geo(request):
     popups = []
     hrefs = []
     ids = []
-    for post in posts:
-        locations = post.locations.all()
+    for article in articles:
+        locations = article.locations.all()
         html_popup = folium.Html("""
                 <div class="card border-0 align-items-center">
                     <h4>{header}</h4>
@@ -217,14 +220,14 @@ def geo(request):
                         <span>Читать</span>
                     </button>
                 </div>
-        """.replace("{header}", post.title).replace("{image}", post.image_url))
+        """.replace("{header}", article.title).replace("{image}", article.image_url))
         for location in locations:
-            imgs.append(post.image_url)
-            titles.append(post.title)
+            imgs.append(article.image_url)
+            titles.append(article.title)
             lats.append(location.latitude)
             lngs.append(location.longitude)
-            hrefs.append("/article/" + str(post.id))
-            ids.append(post.id)
+            hrefs.append("/article/" + str(article.id))
+            ids.append(article.id)
             popups.append(html_popup.render())
 
     data = list(zip(lats, lngs, titles, imgs, hrefs, ids))
@@ -264,29 +267,3 @@ def geo(request):
 
     html_template = loader.get_template('home/geo.html')
     return HttpResponse(html_template.render(context, request))
-
-
-@login_required(login_url="/login/")
-def pages(request):
-    context = {}
-    # All resource paths end in .html.
-    # Pick out the html file name from the url. And load that template.
-    try:
-
-        load_template = request.path.split('/')[-1]
-
-        if load_template == 'admin':
-            return HttpResponseRedirect(reverse('admin:index'))
-        context['segment'] = load_template
-
-        html_template = loader.get_template('home/' + load_template)
-        return HttpResponse(html_template.render(context, request))
-
-    except template.TemplateDoesNotExist:
-
-        html_template = loader.get_template('home/page-404.html')
-        return HttpResponse(html_template.render(context, request))
-
-    except:
-        html_template = loader.get_template('home/page-500.html')
-        return HttpResponse(html_template.render(context, request))

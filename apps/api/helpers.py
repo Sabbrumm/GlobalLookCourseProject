@@ -1,10 +1,9 @@
 import re
-import time
+import signal
 import warnings
 from queue import Queue
-from threading import Thread
+from threading import Thread, Event
 
-from asgiref.sync import async_to_sync, sync_to_async
 from razdel import sentenize
 from natasha import (
     Segmenter,
@@ -19,8 +18,7 @@ from natasha import (
 from bs4 import BeautifulSoup
 from datetime import date, timedelta
 
-from apps.api.models import GeoLocation, Persona
-from apps.home.models import Post
+from apps.api.models import GeoLocation, Persona, Article
 
 import requests
 
@@ -68,7 +66,7 @@ class LentaParser:
         return res
 
     @staticmethod
-    def analyze_text(text) -> dict:
+    def analyze_text(text:str) -> dict:
         if text == '':
             return {}
 
@@ -164,6 +162,7 @@ class LentaParser:
 
         return None, None
 
+
 class LentaCrawlerTask(object):
     task_type:str
     task_date:date
@@ -174,10 +173,12 @@ class LentaCrawlerTask(object):
         self.is_done = True
         self.task_result = task_result
 
+
 class LentaCrawlerTaskRange(LentaCrawlerTask):
     def __init__(self, range_start: date, range_end: date):
         self.task_type:str = 'parse_range'
         self.task_date_range = (range_start, range_end)
+
 
 class LentaCrawlerTaskSingle(LentaCrawlerTask):
     def __init__(self, single_date: date):
@@ -200,25 +201,26 @@ class LentaCrawler:
     def __init__(self, do_refresh: bool = True):
         self._task_queue = Queue()
         self._constant_parsing = do_refresh
-        self.running = False
-
-
+        self._exit_event = Event()
+        self.task1_end = False
+        self.task2_end = False
+        for sig in ('TERM', 'INT'):
+            signal.signal(getattr(signal, 'SIG' + sig), self.stop)
 
     def _crawl(self, crawl_date: date):
+        print("Parsing: " + crawl_date.strftime("%Y-%m-%d"))
         parser = LentaParser()
         topics = parser.parse_topics(crawl_date)
         created_geos = 0
         created_pers = 0
         created_posts = 0
         for topic in topics:
+            if self._exit_event.is_set(): break
             obj = parser.parse(topics[topic])
             geos = []
             pers_s = []
 
-
-
             for loc in obj['locs']:
-
                 geo, created = GeoLocation.objects.get_or_create(
                     name=loc['name'],
                     latitude=loc['latitude'],
@@ -226,7 +228,6 @@ class LentaCrawler:
                 )
                 geos.append(geo)
                 created_geos += created
-            print("Created {} geos".format(created_geos))
 
             for pers in obj['pers']:
                 pers, created = Persona.objects.get_or_create(
@@ -235,12 +236,8 @@ class LentaCrawler:
                 pers_s.append(pers)
                 created_pers += created
 
-            print("Created {} persons".format(created_pers))
 
-            post = Post.objects
-
-
-            post, created = Post.objects.get_or_create(
+            post, created = Article.objects.get_or_create(
                 title=obj['title'],
                 subtitle=obj['subtitle'],
                 content=obj['content'],
@@ -251,7 +248,9 @@ class LentaCrawler:
                 post.personas.set(pers_s)
                 post.locations.set(geos)
             created_posts += created
-            print("Created {} posts".format(created_posts))
+        print("Created {} geos".format(created_geos))
+        print("Created {} persons".format(created_pers))
+        print("Created {} posts".format(created_posts))
         result = {
             "created_geos": created_geos,
             "created_pers": created_pers,
@@ -259,12 +258,15 @@ class LentaCrawler:
         }
         return result
 
-    @staticmethod
-    def _crawl_range(self, range_start: date, range_end: date):
+
+    def _crawl_range(self, range:(date, date)):
+        range_start, range_end = range
+        print(range_start, range_end)
         ret = []
         while range_start < range_end:
             ret.append(self._crawl(range_start))
-            range_start += timedelta(days=1)
+            range_start = range_start + timedelta(days=1)
+            print(range_start, range_end)
         return ret
 
     def crawl(self, crawl_date: date):
@@ -284,42 +286,37 @@ class LentaCrawler:
 
     def _constant_parsing_queue_manager(self):
         print("LentaCrawler parsing manager started")
-        while self.running:
+        while not self._exit_event.is_set():
             if self._constant_parsing:
                 self._task_queue.put(LentaCrawlerTaskSingle(date.today()))
-            time.sleep(self.REQUEST_DELAY)
+            self._exit_event.wait(self.REQUEST_DELAY)
+        print("LentaCrawler parsing manager stopped")
+        self.task2_end = True
     def _executor(self):
         print('LentaCrawler Task executor started')
-        while self.running:
+        while not self._exit_event.is_set():
             task = self._task_queue.get()
             res = None
             if task.task_type == 'parse_single':
                 res = [self._crawl(task.task_date)]
             elif task.task_type == 'parse_range':
-                res = self._crawl_range(*task.task_date)
+                res = self._crawl_range(task.task_date_range)
             task.done(res)
-    def stop(self):
-        self.running = False
+        print('LentaCrawler Task executor stopped')
+        self.task1_end = True
+    def stop(self, *args):
+        print('Stopping LentaCrawler instance')
+        self._task_queue = Queue()
+        self._exit_event.set()
+        while not (self.task1_end and self.task2_end):
+            pass
+        exit(0)
     def start(self):
-        self.running = True
         thread1 = Thread(target=self._constant_parsing_queue_manager)
         thread2 = Thread(target=self._executor)
         thread1.start()
         thread2.start()
         print('Started LentaCrawler instance')
 
-
-
-# --------------------------------
-
-# получение списка урлов за за определенную дату
-# возвращает словарь формата {"Заголовок":"url"}
-
-
-# --------------------------------
-# пример получения инфы в бд
-
-
-# --------------------------------
-# пример итерации даты по 1 дню соответственно
-# print(r)
+    def __del__(self):
+        self.stop()

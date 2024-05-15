@@ -1,11 +1,4 @@
-# -*- encoding: utf-8 -*-
-"""
-Copyright (c) 2019 - present AppSeed.us
-"""
-
 from django.db import models
-
-# Create your models here.
 
 class GeoLocation(models.Model):
     id = models.AutoField(primary_key=True)
@@ -16,3 +9,14 @@ class GeoLocation(models.Model):
 class Persona(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=512)
+
+
+class Article(models.Model):
+    id = models.AutoField(primary_key=True)
+    title = models.CharField()
+    subtitle = models.CharField()
+    content = models.TextField()
+    date = models.DateTimeField()
+    image_url = models.URLField(blank=True, null=True)
+    locations = models.ManyToManyField(GeoLocation)
+    personas = models.ManyToManyField(Persona)

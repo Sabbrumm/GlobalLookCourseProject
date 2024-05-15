@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class MyConfig(AppConfig):
-    name = 'apps.feed'
-    label = 'apps_feed'
+class HomeConfig(AppConfig):
+    name = 'apps.home'
+    label = 'apps_home'

@@ -1,11 +1,21 @@
-# -*- encoding: utf-8 -*-
-"""
-Copyright (c) 2019 - present AppSeed.us
-"""
+from datetime import date, timedelta
 
 from django.apps import AppConfig
 
+crawler = None
 
-class AuthConfig(AppConfig):
-    name = 'apps.index'
-    label = 'apps_index'
+def create_crawler():
+    from .helpers import LentaCrawler
+    global crawler
+    if crawler is not None:
+        return crawler
+    crawler = LentaCrawler()
+    crawler.start()
+    return crawler
+
+class ApiConfig(AppConfig):
+    name = 'apps.api'
+    label = 'apps_api'
+
+    def ready(self):
+        create_crawler()
