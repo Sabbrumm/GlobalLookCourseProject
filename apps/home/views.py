@@ -43,6 +43,49 @@ def article(request):
     html_template = loader.get_template('home/article.html')
     return HttpResponse(html_template.render(context, request))
 
+
+def make_filter_map():
+    lat = 0
+    lng = 0
+    map = folium.Map(location=[lat, lng], zoom_start=20)
+    marker = folium.Marker(
+        [lat, lng],
+        zoom_start=20,
+        icon=folium.Icon(color="red", icon="")
+    ).add_to(map)
+
+    # map.add_child(folium.LatLngPopup())
+
+    """    {map}.on("click", replaceMarker);
+
+    function replaceMarker(e) {
+        {marker}.setLatLng(e.latlng);
+        {marker}.draggable = true;
+        window.parent.document.getElementById('lat-input').value = {marker}.getLatLng().lat;
+        window.parent.document.getElementById('lng-input').value = {marker}.getLatLng().lng;
+    }"""
+
+    map.get_root().html.add_child(
+        folium.Element(
+            """
+    <script type="text/javascript">
+    $(document).ready(function () {
+    window.parent.filter_marker = {marker};
+    window.parent.filter_map = {map};
+
+    });
+
+    </script>
+    """.replace(
+                "{map}", map.get_name()
+            )
+            .replace(
+                "{marker}", marker.get_name()
+            )
+        )
+    )
+    return map._repr_html_()
+
 @login_required(login_url="/login/")
 def feed(request:WSGIRequest):
     context = {'segment': 'feed'}
@@ -104,49 +147,10 @@ def feed(request:WSGIRequest):
     context['pg_nums'] = pg_nums
 
     context['posts'] = articles
-    lat = 0
-    lng = 0
-
-    map = folium.Map(location=[lat, lng], zoom_start=20)
-    marker = folium.Marker(
-        [lat, lng],
-        zoom_start=20,
-        icon=folium.Icon(color="red", icon="")
-    ).add_to(map)
-
-    #map.add_child(folium.LatLngPopup())
-
-    """    {map}.on("click", replaceMarker);
-    
-    function replaceMarker(e) {
-        {marker}.setLatLng(e.latlng);
-        {marker}.draggable = true;
-        window.parent.document.getElementById('lat-input').value = {marker}.getLatLng().lat;
-        window.parent.document.getElementById('lng-input').value = {marker}.getLatLng().lng;
-    }"""
 
 
-    map.get_root().html.add_child(
-        folium.Element(
-            """
-    <script type="text/javascript">
-    $(document).ready(function () {
-    window.parent.filter_marker = {marker};
-    window.parent.filter_map = {map};
 
-    });
-
-    </script>
-    """.replace(
-                "{map}", map.get_name()
-            )
-        .replace(
-                "{marker}", marker.get_name()
-            )
-        )
-    )
-    map = map._repr_html_()
-    context['map'] = map
+    context['map'] = make_filter_map()
     context['href_tags'] = href_tags
     context['pg_prev'] = page-1
     context['pg_next'] = page+1
@@ -196,9 +200,6 @@ def geo(request):
         kwargs['date__gte'] = datetime.datetime.strptime(date_from, '%Y-%m-%d')
     if date_to:
         kwargs['date__lte'] = datetime.datetime.strptime(date_to, '%Y-%m-%d')
-
-    # Ограничение - только за сегодняшний день
-    kwargs['date__gte'] = datetime.date.today()
 
     href_tags += f"&date_start={date_from}&date_end={date_to}" if date_from or date_to else ""
     articles = Article.objects.filter(**kwargs).order_by('-date')
@@ -264,6 +265,7 @@ def geo(request):
 
     groups.add_to(map)
     context['map'] = map._repr_html_()
+    context['map_filter'] = make_filter_map()
 
     html_template = loader.get_template('home/geo.html')
     return HttpResponse(html_template.render(context, request))

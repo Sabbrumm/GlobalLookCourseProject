@@ -8,18 +8,111 @@
     <div class="header bg-primary pb-6">
       <div class="container-fluid">
         <div class="header-body">
-          <div class="row align-items-center py-4">
+            <div class="row align-items-center py-4">
             <div class="col-lg-6 col-7">
               <h6 class="h2 text-white d-inline-block mb-0">Карта событий</h6>
               <nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
                 <ol class="breadcrumb breadcrumb-links breadcrumb-dark">
-                  <li class="breadcrumb-item"><a href="/feed"><i class="fas fa-home"></i></a></li>
+                  <li class="breadcrumb-item"><a href="/geo"><i class="fas fa-home"></i></a></li>
                 </ol>
               </nav>
             </div>
             <div class="col-lg-6 col-5 text-right">
+              <button class="btn btn-sm btn-neutral collapse-toggle" data-toggle="collapse" data-target="#filters-input">Фильтры</button>
             </div>
           </div>
+            <div class="collapse card" id="filters-input">
+                <div class="card-body">
+                    <form>
+                        <div id="date-filter-toggle" class="row mx-1 mb-3">
+                            <label class="custom-toggle mr-2">
+                              <input id="date-filter-toggle-cb" type="checkbox" data-toggle="collapse" data-target="#date-filter-block">
+                              <span class="custom-toggle-slider rounded-circle"></span>
+                            </label>
+                            <label class="h4 m-0">Фильтр по дате</label>
+                        </div>
+
+                        <div id="date-filter-block" class="collapse">
+                            <label class="form-control-label" for="date_start">Дата старта - дата окончания</label>
+                            <div class="input-group mb-3">
+                                <input type="date" class="form-control" id="date_start" placeholder="От">
+                                <input type="date" class="form-control" id="date_end" placeholder="До">
+                            </div>
+                        </div>
+
+                        <div id="map-filter-toggle" class="row mx-1 mb-3">
+                            <label class="custom-toggle mr-2">
+                              <input id="map-filter-toggle-cb" type="checkbox" data-toggle="collapse" data-target="#map-filter-block">
+                              <span class="custom-toggle-slider rounded-circle"></span>
+                            </label>
+                            <label class="h4 m-0">Фильтр по месту</label>
+                        </div>
+
+                        <div id="map-filter-block" class="collapse">
+                            <label class="form-control-label">Местоположение</label>
+                            <div class="row mb-3">
+
+                                <div class="col-md-6 mb-0">
+                                    <input type="text" class="d-none" id="lat-input">
+                                    <input type="text" class="d-none" id="lng-input">
+                                    <div class="card border-0" style="overflow: hidden">
+                                      {{ map_filter | safe }}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="fas fa-search"></i></span>
+                                        </div>
+                                        <input type="search" class="form-control" id="input-find-place" placeholder="Поиск мест">
+                                    </div>
+                                    <div class="container p-0 m-0">
+                                         <div class="btn-group-vertical w-100" id="variant-list-place"></div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="persona-filter-toggle" class="row mx-1 mb-3">
+                            <label class="custom-toggle mr-2">
+                              <input id="persona-filter-toggle-cb" type="checkbox" data-toggle="collapse" data-target="#persona-filter-block">
+                              <span class="custom-toggle-slider rounded-circle"></span>
+                            </label>
+                            <label class="h4 m-0">Фильтр по именам</label>
+                        </div>
+
+                        <div id="persona-filter-block" class="collapse">
+                            <label class="form-control-label" for="input-find-person-org">Персоны / Организации</label>
+                            <div class="row mb-3 mx-0">
+                                <div class="col-12 px-0">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="fas fa-search"></i></span>
+                                        </div>
+                                        <input type="search" class="form-control h-auto" id="input-find-person-org" placeholder="Ищите персоны или организации">
+                                        <div class="form-control overflow-auto h-auto" type="text" id="taglist-persona"></div>
+                                    </div>
+                                </div>
+                                <div class="col-12 px-0">
+                                     <div class="btn-group-vertical w-100" id="variant-list-persona"></div>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+
+
+
+
+
+                        <div class="input-group">
+                            <a class="btn btn-block btn-primary text-white" id="filter-search-button">Искать</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
       </div>
     </div>
@@ -43,7 +136,10 @@
 {% block javascripts %}
 
 <script src="https://cdn.jsdelivr.net/npm/@folium/folium@0.10.1/folium.min.js"></script>
-
+<script src="/static/assets/vendor/chart.js/dist/Chart.min.js"></script>
+<script src="/static/assets/vendor/chart.js/dist/Chart.extension.js"></script>
+<script src="/static/assets/js/geo_filter.js"></script>
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
 
 
 {% endblock javascripts %}
