@@ -241,8 +241,8 @@ class LentaCrawler:
                 title=obj['title'],
                 date=obj['date']
             )
-            post.subtitle = obj['subtitle'],
-            post.content = obj['content'],
+            setattr(post, 'subtitle', obj['subtitle'])
+            setattr(post, 'content', obj['content'])
             post.image_url = obj['image_url']
             post.save()
             if created:
