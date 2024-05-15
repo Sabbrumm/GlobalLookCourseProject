@@ -94,7 +94,7 @@ def feed(request:WSGIRequest):
     elif page < 1:
         page = 1
 
-    articles = Article.objects.filter(**kwargs).order_by('-date')[8 * (page - 1):8 * (page)]
+    articles = Article.objects.filter(**kwargs).order_by('-id')[8 * (page - 1):8 * (page)]
 
     context['page'] = page
     context['total_pages'] = total_pages

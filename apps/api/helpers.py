@@ -239,11 +239,12 @@ class LentaCrawler:
 
             post, created = Article.objects.get_or_create(
                 title=obj['title'],
-                subtitle=obj['subtitle'],
-                content=obj['content'],
-                date=obj['date'],
-                image_url=obj['image_url'],
+                date=obj['date']
             )
+            post.subtitle = obj['subtitle'],
+            post.content = obj['content'],
+            post.image_url = obj['image_url']
+            post.save()
             if created:
                 post.personas.set(pers_s)
                 post.locations.set(geos)
